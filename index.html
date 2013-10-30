@@ -1,0 +1,1092 @@
+<!DOCTYPE html>
+<html>
+    
+    <head>
+        <title></title>
+        <meta name = "format-detection" content = "telephone=no">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no;" />
+            <meta charset="utf-8">
+                <link rel="stylesheet" href="appML/css/hicTech/MobileAppStyle.css">
+                    <style type="text/css" media="all">@import "appML/themes/apple/theme.css";</style>
+                    
+                   
+                    <script src="js/ChildBrowser.js" type="application/x-javascript" charset="utf-8"></script>
+                    <script src="js/EmailComposer.js" type="application/x-javascript" charset="utf-8"></script>
+                    <script src="js/LocalNotification.js" type="application/x-javascript" charset="utf-8"></script>
+                    
+                    <script type="text/javascript" charset="utf-8" src="js/FBConnect.js"></script>
+                    <script type="text/javascript" charset="utf-8" src="js/iscroll.js"></script>
+                    
+                    <script type="text/javascript" charset="utf-8" src="appML/js/jquery/jquery-1.4.4-hicVersion-min.js"></script>
+                    <script type="text/javascript" charset="utf-8" src="appML/js/plugins/canvasLoader/canvasLoader.js"></script>
+                    <script type="text/javascript" charset="utf-8" src="appML/js/plugins/livequery/jquery.livequery-1.0.3.js"></script>
+                    <script type="text/javascript" charset="utf-8" src="appML/js/hicTech/appManager.js"></script>
+                    
+                    <script type="text/javascript" src="js/date.js"></script>
+                    
+                    
+                    <link rel="stylesheet" href="css/spinningwheel.css" type="text/css" media="all" />
+                    <script type="text/javascript" src="js/spinningwheel.js"></script>
+                    
+                    <style type="text/css" media="screen">@import "sliderControl.css";</style>
+                    <script src="sliderControl.js" type="text/javascript" charset="utf-8"></script>
+                    
+                    
+                    <script src="amcharts/javascript/raphael.js"></script>
+                    <script src="amcharts/javascript/amcharts2.js"></script>
+                    
+                    
+                    <link rel="stylesheet" href="css/index.css" type="text/css" media="all" />
+                    
+                    <script src="js/onload.js" type="text/javascript"></script>
+                    <script src="js/index.js" type="text/javascript"></script>
+                    
+                    
+                    <script type="text/javascript">
+                        
+                        // Global variables
+                        var db;
+                        if(localStorage["user_data"]!=null){user_data = JSON.parse(localStorage["user_data"])};
+                        var pictureSource;
+                        var destinationType;
+                        var user_name;
+                        var DOM=0;
+                        var TOM=0;
+                        var TSM=0;
+                        var TSE=0;
+                        var tsmval;
+                        var tseval;
+                        var doeval;
+                        var NO_value=0;
+                        var NO_level="DEPLETED";
+                        var tsmval;
+                        var tseval;
+                        var doeval;
+                        var LOF=[];
+                        var LOE=[];
+                        var current_recording_id;
+                        var daysoffset=0;
+                        var weeksoffset=0;
+                        var monthsoffset=0;
+                        var targetday=0;
+                        var activepanel="";
+                        var statistics;
+                        var total_rec_measurements=0;
+                        var scrollNav;
+                        var scrollNav2;
+                        var scrollIntro;
+                        
+                        var access_token; //facebook
+                        
+                        var color_depleted = "#e5d7e2";
+                        var color_low = "#ebc1d6";
+                        var color_threshold = "#eca1c6";
+                        var color_ontarget = "#e675b6";
+                        var color_high = "#db61a9";
+                        
+                        var allowClick = true;
+                        function preventGhostClick(){
+                            allowClick = false;
+                            setTimeout(function(){
+                                       allowClick = true;
+                                       },500);
+                        }
+                    var not_online=0;
+                    var client_browser;
+                    
+                    
+                    var client_id = "350553341730594";
+                    var redir_url = "https://www.facebook.com/connect/login_success.html"; // changed from http://www.facebook.com/connect/login_success.html
+                    
+                    
+
+                    
+                    function send_mail(){
+                        var subject = "Berkeley Test";
+                        var body = "";
+                        var toRecipients ='info@berkeleytest.com';
+                        var ccRecipients = '';
+                        var bccRecipients = '';
+                        var bIsHTML = 'true';
+                        
+                        //window.plugins.emailComposer.showEmailComposer(subject,body,toRecipients,ccRecipients,bccRecipients,bIsHTML);
+                        
+                        function backtomenu(){
+                            navigator.notification.alert("The Field Information Card was successfully e-mailed.", jQT.goBack(3), "Done!");
+                            
+                        }
+                        console.log("email");
+                        EmailComposer.prototype.showEmailComposerWithCB('backtomenu()',subject,body,toRecipients,ccRecipients,bccRecipients,bIsHTML);
+                        
+                        
+                        
+                        
+                        
+                    }
+                    
+                    
+                    function landing(){
+                        console.log("landing");
+                        
+                        db = openDatabase('berkeleytest', '1.0', 'berkeleytest', 65536);
+                        
+                        //setTimeout(function(){$("#notification_2").cssFadeIn()},3000);
+                        
+                        activate_reminders();
+                        
+                        
+                        
+                        console.log("user_data: "+localStorage["user_data"]);
+                        
+                        
+                        if(localStorage["user_data"]!=null){
+                            access_token = user_data[15];
+                            document.getElementById("userPictureSrc").src = "http://graph.facebook.com/"+user_data[0]+"/picture";
+                            document.getElementById("user_email").value = user_data[1];
+                            document.getElementById("user_password").value = user_data[2];
+                            //document.getElementById("user_firstname").value = user_data[3];
+                            //document.getElementById("user_lastname").value = user_data[4];
+                            document.getElementById("user_sex").value = user_data[5];
+                            document.getElementById("user_age").value = user_data[6];
+                            document.getElementById("user_weight").value = user_data[7];
+                            document.getElementById("user_hypertensive").value = user_data[8];
+                            document.getElementById("user_activity").value = user_data[9];
+                            //document.getElementById("user_address").value = user_data[10];
+                            //document.getElementById("user_city").value = user_data[11];
+                            //document.getElementById("user_zip").value = user_data[12];
+                            //document.getElementById("user_state").value = user_data[13];
+                            //document.getElementById("user_country").value = user_data[14];
+                            load_measurements();
+                            //load_stats();
+                            //console.log("window.screen.height="+window.screen.height);
+                            if(window.screen.height==568){
+                                $("#home_page").parent().parent().parent().parent().parent().height(465);
+                            }else{
+                                $("#home_page").parent().parent().parent().parent().parent().height(370);
+                            }
+                            //console.log($("#home_page").parent().parent().parent().parent().parent().attr('id'));
+                            //console.log($("#home_page").parent().parent().parent().parent().parent().height());
+                            jQT.goTo("#mynoxy_page");
+                        }else{
+                            if(window.screen.height==568){
+                                $("#home_page").parent().parent().parent().parent().parent().height(568);
+                            }else{
+                                $("#home_page").parent().parent().parent().parent().parent().height(480);
+                            }
+                            //console.log($("#home_page").parent().parent().parent().parent().parent().attr('id'));
+                            //console.log($("#home_page").parent().parent().parent().parent().parent().height());
+                            jQT.goTo("#home_page");
+                        }
+                        
+                        
+                        
+                        //query_addressbook();
+                        
+                        $("body").append("<div class='notification_class' id='notification_1' ontouchstart='$(this).cssFadeOut(); jQT.goTo(\"mynoxy_page\")'><div align='center'><img src='alert1.png' width='100'><br><br><h1>What is your Nitric Oxide level?</h1><p>It has been 2 hours since your last recording.</p><p>Take the Berkeley Test - Let's see how you are doing.</p><p>Live well and be fit.</p>   <p><i>Your Berkeley Test Team</i></p> </div><img src='close.png' width='30' style='position:absolute; top:10px; right:10px'></div>");
+                        
+                        $("body").append("<div class='notification_class' id='notification_2' ontouchstart='$(this).cssFadeOut();jQT.goTo(\"mynoxy_page\")'><div align='center'><img src='alert1.png' width='100'><br><br><h1>It has been 3 days since your last Berkeley Test</h1><p>What are your Nitric Oxide levels now?</p><p>Keep exercising and eating healthy whole foods rich in leafy greens, beets, fruit, daily.</p>          <p>Live well and be fit.</p>   <p><i>Your Berkeley Test Team</i></p> </div><img src='close.png' width='30' style='position:absolute; top:10px; right:10px'></div>");
+                        
+                        $("body").append("<div class='notification_class' id='notification_3' ontouchstart='$(this).cssFadeOut();callWebPage(\"www.amazon.com/Nitric-Oxide-Test-Strips-Berkeley/dp/B00BMVQS02/ref=sr_1_1?ie=UTF8&qid=1363102014&sr=8-1&keywords=berkeley+test+nitric+oxide+test+strips\")'><div align='center'><img src='alert1.png' width='100'><br><br><h1>Your Berkeley Test strips are running low</h1><p>Let us now if you want more sent out in the next day or two.</p>   <p>Keep exercising and eating healthy whole foods rich in leafy greens, beets, fruit, daily.</p>      <p>Live well and be fit.</p>   <p><i>Your Berkeley Test Team</i></p> </div><img src='close.png' width='30' style='position:absolute; top:10px; right:10px'></div>");
+                        
+                    }
+                    
+                    
+                    
+                    
+                    function notification1callback(id){
+                        console.log("I WAS IN THE BACKGROUND ID="+id);
+                        $("#notification_1").cssFadeIn();
+                    }
+                    
+                    function notification2callback(id){
+                        console.log("I WAS IN THE BACKGROUND ID="+id);
+                        $("#notification_2").cssFadeIn();
+                    }
+                    
+                    
+                    
+                    
+                    function onBodyLoad()
+                    {
+                        setTimeout(function(){
+                                   
+                                   document.addEventListener("deviceready", onDeviceReady, false);
+
+                                   },100);
+                    }
+                    
+                    
+                    
+                    
+                    document.addEventListener("resume", onResume, false);
+                    
+                    function onResume() {
+                        
+                    }
+                    
+                    
+                        </script>
+                    </head>
+    
+    <body onload="onBodyLoad()">
+		<appml>
+            
+			
+			<content>
+				
+                <top><img src='img/topbarimagesmall.png' width=320></top>
+                
+				<navigation height="40px"></navigation>
+                
+                
+                
+                <panel id="panel0" title="" data-appml-icon="00-appML.png">    
+                    
+                    
+                    
+                    
+                    <page id="home_page" scrollable="false">
+                        <img src="img/icon_1024.png" width="300">
+                            
+                            
+                            <div class="lower" align="center">
+                                <a href="#intro_page" class="blueButton">What is your Nitric Oxide level?</a>
+                                <a href="#" class="blueButton" ontouchstart="callWebPage('www.berkeleytest.com')">Berkeley Test Online</a>
+                                <a href="#about_page" class="blueButton slideup">About Berkeley Test</a>
+                            </div>
+                            
+                            </page>
+                    
+                    
+                    
+                    <page id="intro_page" scrollable="false">
+                        <div id="introWrapper">
+                            <div id="introScroller">
+                                <ul>
+                                    <li><img src="img/intro_slide1.jpg" width="200" border=1><br><em>1. Measure your Nitric Oxide levels with a Berkeley Test strip and enter the value in the app.</em></li>
+                                    <li><img src="img/intro_slide2.jpg" width="200" border=1><br><em>2. Enter any Nitric Oxide-rich food you ate up to 4 hours before your NO measurement.</em></li>
+                                    <li><img src="img/intro_slide3.jpg" width="200" border=1><br><em>3. Save your measurement.<br>You are done!</em></li>
+                                    <li><img src="img/intro_slide4.jpg" width="200" border=1><br><em>4. Track your measurements day after day.</em></li>
+                                    <li><img src="img/intro_slide5.jpg" width="200" border=1><br><em>5. Analyze your results and find out how your eating habits impact on your NO levels.</em></li>
+                                    <li>
+                                        <div align="center" style="margin-top:30px; height:320px; background:url(); background-size:320px auto">
+                                            <img src="img/login_facebook.jpg" width="207" ontouchstart="onPubFacebookBtn()" style="margin-top:70px">
+                                                <img src="img/or.png" width="207" style="margin-top:10px">
+                                                    <a class="blueButton" href="#" ontouchstart="sign_in()" style="padding:5px; width:195px; border-radius:4px; font:normal 16px AvenirNextCondensed-Regular"><b>Login in</b> with <b>Berkeley Test</b></a>
+                                                    </div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div id="introDots" align="center">
+                            <ul id="introIndicator">
+                                <li class="active">1</li>
+                                <li>2</li>
+                                <li>3</li>
+                                <li>4</li>
+                                <li>5</li>
+                                <li>6</li>
+                            </ul>
+                        </div>
+                    </page>
+                    
+                    
+                    
+                    
+                    
+                    <page id="about_page" scrollable="false">
+                        <div align="left" style="padding:15px; font-family: AvenirNextCondensed-Regular;">
+                            
+                            <p align="center"><b>Berkeley Test<span class='superscript'>®</span> is an easy and affordable way to check your Nitric Oxide status throughout the day</b></p>
+                            <p>Nitric oxide, or NO, for short, is produced in our body, naturally.  In 1998, the Nobel Prize for medicine was awarded for the discovery of the important role of Nitric Oxide in our cardiovascular system.</p>
+                            <p><b>
+                                Elevated levels of Nitric Oxide:</b><br>
+                            
+                            * increases athletic performance and endurance<br>
+                            * improves cardiovascular health<br>
+                            * protects blood vessels from vascular ageing<br>
+                            
+                            </p>
+                            <p>
+                            Using saliva, the Berkeley Test® monitors your body's Nitric Oxide status throughout the day.  By tracking your saliva Nitric Oxide levels multiple times a day with the Berkeley Test®, you can make immediate and real-time dietary lifestyle adjustments.</p>
+                            <p>
+                            Daily consumption of leafy greens, such as Spinach, Arugula, Beetroots, among other Nitric Oxide rich vegetables and fruits is the safest and healthiest way to elevate your natural Nitric Oxide levels.
+                            </p>
+                            <p align="center">
+                            <a href="#" class="blueButton" onclick="callWebPage('www.berkeleytest.com')" style="width:200px">More information</a>
+                            </p>
+                        </div>
+                    </page>
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    
+                    <page id="login_page" scrollable="false">
+                        <div id="form_title" align="center" style="font-size:20px; font-weight:normal; text-shadow:0px 1px 1px #fff; color:#2c5683"></div>
+                        <br>
+                        <ul class="nicebox" style="margin-left:10px;">
+                            <li>
+                                <div>
+                                    <div>E-mail:</div>
+                                    <div><input value="" type="email" id="r_email"/></div>
+                                </div>
+                            </li>
+                            <li>
+                                <div>
+                                    <div>Password:</div>
+                                    <div><input value="" type="password" id="r_password"/></div>
+                                </div>
+                            </li>
+                            <li>
+                                <div>
+                                    <!--<div><input type="checkbox" name="some_name" value="Hello" id="some_name" title="first" checked data-appml-label="Keep me signed in"/></div>-->
+                                </div>
+                            </li>
+                        </ul>
+                        
+                        <br>
+                        <div align="center" id="login_response" align="center" style="color:#cc0000; font-size:16px; font-weight:bold;"></div>
+                        
+                        <div align="center"><a id="login_button" class="blueButton" href="#" onclick="login()">Sign in</a>
+                            <div align="right" style="padding-right:15px;"><a href="#" id="password_button" onclick="jQT.goTo('#password','slideup')" style="color:#333; font-size:14px; text-decoration:none"><br>I forgot my password ➤</a></div>
+                        </div>
+                        
+                        
+                        
+                        <div align="center"><a id="register_button" class="blueButton" href="#" onclick="register()">Register</a></div>
+                        
+                        <div id="newuser_button" align="center"><br><a class="grayButton" href="#" onclick="sign_up()">I am new here</a></div>
+                        <div id="olduser_button" align="center"><br><br><br><br><br><a class="grayButton" href="#" onclick="sign_in()">I already have an account</a></div>
+                        </div>
+					</page>
+                    
+                    
+                    
+                    
+                    <page id="password" scrollable="false">
+                        <div id="form_title" align="center" style="font-size:18px; color:##333"><br>Please enter your user e-mail<br>and we will send your password.</div><br>
+                        <ul class="nicebox" style="margin-left:10px;">
+                            <li>
+                                <div>
+                                    <div>E-mail:</div>
+                                    <div><input value="" type="email" id="email_for_password"/></div>
+                                </div>
+                            </li>
+                        </ul>
+                        <br>
+                        
+                        <div align="center" id="password_response" align="center" style="font-size:16px; font-weight:bold;"><br></div>
+                        <br>
+                        <div align="center"><a class="blueButton" href="#" onclick="send_password()">Recover password</a></div>
+					</page>
+                    
+                    
+                </panel>
+                
+                
+                
+                
+                
+                
+                
+                
+                <panel id="panel1" title="my_day" data-appml-icon="00-appML.png">
+                    <page id="myday_page" scrollable="false">
+                        <div align="center">
+                            <div class="picker2">
+                                <span id="today_button">DAY</span><span id="week_button">WEEK</span><span id="month_button">MONTH</span>
+                            </div>
+                            <div id="myday_picker" class="picker" align="center">
+                                <span>◀</span><span>DATE</span><span>▶</span>
+                            </div>
+                            <div id='graphdiv' style='width:320px; height:210px'></div>
+                            <div class="graphlegend">
+                                <table cellpadding=0 cellspacing=0 border=0>
+                                    <tr><td><div></div></td><td style="text-align:left">MEAL</td><td>Measurements</td><td>Avg. level</td></tr>
+                                    
+                                    <tr><td><div></div></td><td style="text-align:left">MEASUREMENT</td><td id="totalmeasurements" rowspan=2>0</td><td id="avgnolevel" rowspan=2>-</td></tr>
+                                </table>
+                            </div>    
+                        </div>
+                    </page>        
+                    
+                    <page id="myday_calendar" scrollable="false">
+                        <div class="calendar_picker picker" align="center">
+                            <span>◀</span><span>MONTH</span><span>▶</span>
+                        </div>
+                        <div class="calendar_container">
+                            <table class="calendar_header" border=0 cellpadding=0 cellspacing=0 style="">
+                                <tr>
+                                    <td class='text1'>Mon</td><td class='text1'>Tue</td><td class='text1'>Wed</td><td class='text1'>Thu</td><td class='text1'>Fri</td><td class='text1'>Sat</td><td class='text1'>Sun</td>
+                                </tr>
+                            </table>
+                            
+                            <table class="fullcalendar" border=0 cellpadding=0 cellspacing=0>
+                            </table>
+                        </div>
+                    </page>
+                </panel> 
+                
+                
+                
+                
+                
+                
+                
+                
+                <panel id="panel2" title="my_log" data-appml-icon="00-appML.png">
+                    
+                    <page id="mylog_page" scrollable="false">
+                        <div id="mylog_picker" class="picker" align="center">
+                            <span>◀</span><span>DATE</span><span>▶</span>
+                        </div>
+                        <div id="mylog_stats" class="picker" style="display:none;" align="center">
+                            <div class="blueButton2" ontouchstart="jQT.goTo('#panel4')" style="width:130px; padding:3px; margin:0px; font-size:14px">back to My Stats</div>
+                        </div>
+                        
+                        <div class="exscrollable" id='mylog_scrollable'>
+                            <ul id="list_of_measurements">
+                                <li>no measurements</li>
+                            </ul>
+                        </div>
+                        
+                        
+                        
+					</page> 
+                    
+                    <page id="edit_page" scrollable="false">
+                        <div align="center">
+                            <div id="edit_content">
+                                <div class="exscrollable" id="edit_scrollable">
+                                    <ul>
+                                        <li class=""><span></span><span></span></li>
+                                        <li class=""><span><img src="img/icon_food.png" width="45"></span><span></span></li>
+                                        <!--<li class="arrow" onclick="jQT.goTo('#exerciseedit_page2','slide')"><span><img src="img/icon_exercise.png" width="45"></span><span></span></li>-->
+                                    </ul>
+                                </div>
+                                <!--<div id="edit_date"><span></span><span></span><span style="vertical-align:middle"><img src="img/icon_trash.png" width="22"></span></div>-->
+                            </div>
+                        </div>
+					</page>
+                    
+                    
+                    
+                    <page id="mylog_calendar" scrollable="false">
+                        <div class="calendar_picker picker" align="center">
+                            <span>◀</span><span>MONTH</span><span>▶</span>
+                        </div>
+                        <div class="calendar_container">
+                            <table class="calendar_header" border=0 cellpadding=0 cellspacing=0 style="">
+                                <tr>
+                                    <td class='text1'>Mon</td><td class='text1'>Tue</td><td class='text1'>Wed</td><td class='text1'>Thu</td><td class='text1'>Fri</td><td class='text1'>Sat</td><td class='text1'>Sun</td>
+                                </tr>
+                            </table>
+                            
+                            <table class="fullcalendar" border=0 cellpadding=0 cellspacing=0>
+                            </table>
+                        </div>
+                    </page>
+                    
+                    
+                    
+                    <page id="mynoxyedit_page" scrollable="false">
+                        
+                        <div align="center" class="p1top">
+                            
+                            <div align="center"><div style="display:inline-block;"><input type="date" style="font-size:16px;margin-right:20px; width:110px" id="DOMedit" class="bluePicker"></div><div align="right" style="display:inline-block;"><input type="time" style="font-size:16px; width:110px" id="TOMedit" class="bluePicker"></div></div>
+                            
+                        </div>
+                        <div class="p2middle">
+                            <div class="strip">
+                                <span style="display:none"></span>
+                                <span style="background:#e5d7e2"></span>
+                                <span style="background:#ebc1d6"></span>
+                                <span style="background:#eca1c6"></span>
+                                <span style="background:#e675b6"></span>
+                                <span style="background:#db61a9"></span>
+                            </div>
+                        </div>
+                        <div id="navWrapper2">
+                            <div id="navScroller2">
+                                <ul>
+                                    <li style="background:url(strip.png) center top no-repeat; height:400px;">
+                                        <BR><BR><BR><BR>
+                                        <div align="center" style="font-family:AvenirNext-MediumItalic; font-size:22px; line-height:1.5em">TAP THE COLOR THAT BEST MATCHES YOUR BERKELEY TEST STRIP</div>
+                                    </li>
+                                    <li>
+                                        <div align='center'><b>Your Nitric Oxide level is DEPLETED</b></div>
+                                        How many servings of vegetables did you have today?  Start by trying to incorporate a leafy green salad, loaded with spinach and arugula, into your diet.  This will begin to restore your ability to produce Nitric Oxide.  After 1-2 hours, check your saliva Nitric Oxide status.  Be patient while on your health journey and keep plant-based foods included in your diet.  Learn more about Nitric Oxide rich foods at www.berkeleytest.com
+                                    </li>
+                                    <li>
+                                        <div align='center'><b>Your Nitric Oxide level is LOW</b></div>
+                                        Can you increase the frequency of your daily servings of vegetables?  Continue to incorporate leafy green salads into your balanced meals.  Boost your natural Nitric Oxide levels by adding an extra vegetable serving or celery as a snack.  NIH's DASH eating plan recommends a minimum of 4-5 daily vegetable servings.   See if your Nitric Oxide levels peak at 2 hours and remain elevated after 3 hours.
+                                    </li>
+                                    <li>
+                                        <div align='center'><b>Your Nitric Oxide level is THRESHOLD</b></div>
+                                        Now that your levels are on the rise are you able to sustain your Nitric Oxide levels throughout the day?  Daily and frequent servings of Nitric Oxide-rich vegetables are the most effective way to sustain your levels.  Remember, it may take 4-6 daily servings of vegetables.    Go to www.berkeleytest.com to learn more about dietary natural sources.  Check your level every 2-4 hours after your last meal and make dietary adjustments.
+                                    </li>
+                                    <li>
+                                        <div align='center'><b>Your Nitric Oxide level is TARGET</b></div>
+                                        Has your stamina and endurance increased?   Do you see a decrease in your blood pressure?  Target levels correlate with vascular wellness and fitness.  Continue to incorporate cardioprotective leafy greens into your meals and add whole food vegetable snacks and low sodium beet and carrot juices.  To improve and maintain cardiovascular health continue to eat multiple servings of Nitric Oxide-rich vegetables throughout the day.
+                                    </li>
+                                    <li>
+                                        <div align='center'><b>Your Nitric Oxide level is HIGH</b></div>
+                                        High performance and elite athletes consistently show High levels of salivary Nitric Oxide.  Learn more about the benefits of monitoring salivary Nitric Oxide and boosting your levels through exercise and natural foods rich in cardioprotective leafy greens at www.berkeleytest.com
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+					</page>
+                    
+                    
+                    
+                    
+                    <page id="mealedit_page" scrollable="false">
+                        <div align="center">                       
+                            <a href="#edit_page" id="" class="blueButton">Before meal</a>
+                            <a href="#mealedit_page2" id="" class="blueButton">After meal</a>
+                        </div>
+                    </page>
+                    
+                    
+                    <page id="mealedit_page2" scrollable="false">
+                        
+                        <div align="center" class="p2bottom">
+                            <div  style="padding:0 0px">
+                                <div style='font-weight:bold'>Time of meal</div>
+                                <div align="center"><input type="time" class="bluePicker" style="font-size:16px; width:110px" id="TSMedit"></div>
+                            </div>
+                            <div align="center" class="p2bottomA">
+                                <div class="p2bottomA1">
+                                    <div><b>Nitric Oxide-rich food</b><br>
+                                        <div style="font-size:12px">Please list all the NO-rich food you ate during this meal.</div>
+                                        
+                                    </div>
+                                    <div align="center" class="p2bottomA2">
+                                        <div class="exscrollable" id="foodedit_list">
+                                            <ul id="mealedit_items" style="text-align:left">
+                                                <li><br></li>
+                                                <li><br></li>   
+                                                <li><br></li>
+                                            </ul>
+                                        </div>
+                                        <a href="#" class="blueButton" onclick="food_selector('mealedit_items','add')">add food</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+					</page>
+                    
+                    
+                    
+                    
+                    
+                    
+                </panel>
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+				<panel id="panel3" title="NO_levels" data-appml-icon="00-appML.png">
+                    <page id="mynoxy_page" scrollable="false">
+                        
+                        <div align="center" class="p1top">
+                            <div align="center"><div style="display:inline-block;"><input type="date" style="font-size:16px;margin-right:20px; width:110px" id="DOM" class="bluePicker"></div><div align="right" style="display:inline-block;"><input type="time" style="font-size:16px; width:110px" id="TOM" class="bluePicker"></div></div>
+                        </div>
+                        <div class="p1middle">
+                            <div class="strip">
+                                <span style="display:none"></span>
+                                <span style="background:#e5d7e2"></span>
+                                <span style="background:#ebc1d6"></span>
+                                <span style="background:#eca1c6"></span>
+                                <span style="background:#e675b6"></span>
+                                <span style="background:#db61a9"></span>
+                            </div>
+                        </div>
+                        <div id="navWrapper">
+                            <div id="navScroller">
+                                <ul>
+                                    <li style="background:url(strip.png) center top no-repeat; height:400px;">
+                                        <BR><BR><BR><BR>
+                                        <div align="center" style="text-align:center; font-family:AvenirNext-MediumItalic; font-size:18px; line-height:2em; text-shadow: 0px 0px 3px #ffffff;">TAP THE COLOR THAT<br>BEST MATCHES YOUR <br>BERKELEY TEST STRIP</div>
+                                    </li>
+                                    <li>
+                                        <div align='center'><b>Your Nitric Oxide level is DEPLETED</b></div>
+                                        How many servings of vegetables did you have today?  Start by trying to incorporate a leafy green salad, loaded with spinach and arugula, into your diet.  This will begin to restore your ability to produce Nitric Oxide.  After 1-2 hours, check your saliva Nitric Oxide status.  Be patient while on your health journey and keep plant-based foods included in your diet.  Learn more about Nitric Oxide rich foods at www.berkeleytest.com
+                                    </li>
+                                    <li>
+                                        <div align='center'><b>Your Nitric Oxide level is LOW</b></div>
+                                        Can you increase the frequency of your daily servings of vegetables?  Continue to incorporate leafy green salads into your balanced meals.  Boost your natural Nitric Oxide levels by adding an extra vegetable serving or celery as a snack.  NIH's DASH eating plan recommends a minimum of 4-5 daily vegetable servings.   See if your Nitric Oxide levels peak at 2 hours and remain elevated after 3 hours.
+                                    </li>
+                                    <li>
+                                        <div align='center'><b>Your Nitric Oxide level is THRESHOLD</b></div>
+                                        Now that your levels are on the rise are you able to sustain your Nitric Oxide levels throughout the day?  Daily and frequent servings of Nitric Oxide-rich vegetables are the most effective way to sustain your levels.  Remember, it may take 4-6 daily servings of vegetables.    Go to www.berkeleytest.com to learn more about dietary natural sources.  Check your level every 2-4 hours after your last meal and make dietary adjustments.
+                                    </li>
+                                    <li>
+                                        <div align='center'><b>Your Nitric Oxide level is TARGET</b></div>
+                                        Has your stamina and endurance increased?   Do you see a decrease in your blood pressure?  Target levels correlate with vascular wellness and fitness.  Continue to incorporate cardioprotective leafy greens into your meals and add whole food vegetable snacks and low sodium beet and carrot juices.  To improve and maintain cardiovascular health continue to eat multiple servings of Nitric Oxide-rich vegetables throughout the day.
+                                    </li>
+                                    <li>
+                                        <div align='center'><b>Your Nitric Oxide level is HIGH</b></div>
+                                        High performance and elite athletes consistently show High levels of salivary Nitric Oxide.  Learn more about the benefits of monitoring salivary Nitric Oxide and boosting your levels through exercise and natural foods rich in cardioprotective leafy greens at www.berkeleytest.com
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+					</page>
+                    
+                    
+                    
+                    
+                    <page id="meal_page" scrollable="false">
+                        <div align="center">
+                            <br><br><br><br><br><br>
+                            <a href="#summary_page" id="meal_button_yes" class="blueButton">Before meal</a>
+                            <a href="#meal_page2" id="meal_button_no" class="blueButton">After meal</a>
+                        </div>
+                    </page>
+                    
+                    
+                    <page id="meal_page2" scrollable="false">
+                        
+                        <div align="center" class="p2bottom">
+                            <div  style="padding:0 0px">
+                                <div style='font-weight:bold;'>Time of meal</div>
+                                <div align="center"><input type="time" class="bluePicker" style="font-size:16px; width:110px" id="TSM"></div>
+                            </div>
+                            <div align="center" class="p2bottomA">
+                                <div class="p2bottomA1">
+                                    <div><b>Nitric Oxide-rich food</b><br>
+                                        <div style="font-size:12px">Please list all the NO-rich food you ate during this meal.</div>
+                                        
+                                    </div>
+                                    <div align="center" class="p2bottomA2">
+                                        <div class="exscrollable" id="food_list">
+                                            <ul id="meal_items" style="text-align:left">
+                                                <li><br></li>
+                                                <li><br></li>
+                                                <li><br></li>
+                                            </ul>
+                                        </div>
+                                        <a href="#" class="blueButton" onclick="food_selector('meal_items','add')">add food</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+					</page>
+                    
+                    
+                    
+                    <page id="exercise_page" scrollable="false">
+                        <div align="center" class="p3top">                            
+                            <a href="#summary_page" id="exercise_button_yes" class="blueButton">Before exercise</a>
+                            <a href="#exercise_page2" id="exercise_button_no" class="blueButton">After exercise</a>
+                        </div>
+                    </page>
+                    
+                    <page id="exercise_page2" scrollable="false">
+                        <div align="center" class="p3bottom">
+                            <div>Time when I exercised: <span id='tse_str' style='font-weight:bold'></span></div>
+                            <div align="center"><input type="time" style="font-size:16px;" id="TSE"></div>
+                            <br>
+                            <div>Duration of exercise: <span id='doe_str' style='font-weight:bold'></span></div>
+                            <div id='doe' style='padding:0;  margin-top:10px;'></div>
+                            
+                            <div align="center" class="p3bottomA">
+                                <div class="p3bottomA1">
+                                    Exercise
+                                </div>
+                                <div align="center" class="p3bottomA2">
+                                    <div class="exscrollable" height="140px" id="exercise_list">
+                                        <ul id="exercise_items" style="text-align:left">
+                                            <li><br></li>
+                                            <li><br></li>
+                                            <li><br></li>
+                                        </ul>
+                                    </div>
+                                    <a href="#" class="blueButton" onclick="exercise_selector('exercise_items','add')">add exercise</a>
+                                </div>
+                            </div>
+                        </div>
+                        </div>
+					</page>
+                    
+                    
+                    
+                    <page id="summary_page" scrollable="false">
+                        <div align="center">
+                            <div id="summary">
+                                <div class="exscrollable" id="summary_scrollable">
+                                    <ul>
+                                        <li class=""><span></span><span></span></li>
+                                        <li class=""><span><img src="img/icon_food.png" width="45"></span><span></span></li>
+                                        <!--<li class=""><span><img src="img/icon_exercise.png" width="45"></span><span></span></li>-->
+                                    </ul>
+                                </div>
+                                <!--<div id="summary_date"><span></span><span></span><span style="vertical-align:middle"></span></div>-->
+                            </div>
+                        </div>
+					</page>
+                    
+                    
+				</panel>
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                <panel id="panel4" title="my_stats" data-appml-icon="00-appML.png">
+                    <page id="stats_page" scrollable="false">
+                        
+                        <div class="graphbuttons" style="height:30px">
+                            <span style="display:inline-block">
+                                <select style="font-size:14px" id="stats_period" class="bluePicker">
+                                    <option>all time</option>
+                                    <option>period</option>
+                                    <option>this week</option>
+                                    <option>last week</option>
+                                    <option>this month</option>
+                                    <option>last month</option>
+                                </select>
+                            </span>
+                            <span style="display:inline-block"><input type="date" style="font-size:11px" id="stats_from" disabled class="bluePicker"></span>
+                            
+                            <span style="display:inline-block"><input type="date" style="font-size:11px" id="stats_to" disabled class="bluePicker"></span>
+                        </div>
+                        
+                        <div class="text_graph_y">NITRIC OXIDE POTENCY OF MEAL</div>
+                        <div id="stats_graph_container" align="center">
+                            
+                            
+                            
+                            
+                            <div class="text2_graph_y">
+                                <div><span>VERY HIGH</span></div>
+                                <div><span>HIGH</span></div>
+                                <div><span>MEDIUM</span></div>
+                                <div><span>LOW</span></div>
+                                <div><span>VERY LOW</span></div>
+                            </div>
+                            
+                            <div class="text2_graph_x"> <span>+1hr</span> <span>+2hrs</span> <span>+3hrs</span> <span>+4hrs</span> </div>
+                            <div id="stats_graph" style="margin-top:24px;">empty</div>
+                        </div>
+                        <div class="text_graph_x">TIME SINCE MEAL</div>
+                        
+                        <div id="stats_overlay" align="center" ontouchstart="$(this).cssFadeTo(500,0); $('#stats_alert').cssFadeTo(500,0);" style="position:absolute; top:0px; left:0px; height:1000px; width:100%; background:rgba(0,0,0,0); display:none"></div>
+                        
+                        <div id="stats_alert" align="center" ontouchstart="$('#stats_overlay').cssFadeTo(500,0); $(this).cssFadeTo(500,0);" style="position:absolute; top:60px; left:35px; height:235px; width:250px; border-radius:10px; border:3px solid #44bfff; font-family: AvenirNextCondensed-Regular; font-size:18px; line-height:1.5; padding:10px 5px; background:white; display:none;"><div id="stats_alert_text">Alert Alert Alert</div><img src="img/close3.png" width="30" style="position:absolute; top:-15px; right:-15px;"></div>
+                        
+                        <div id="stats_help" ontouchstart="$('#stats_overlay').cssFadeTo(500,0); $(this).cssFadeTo(500,0);" style="position:absolute; top:40px; left:35px; height:280px; width:250px; border-radius:10px; border:3px solid #44bfff; font-family: AvenirNextCondensed-Regular; font-size:18px; line-height:1.5; padding:10px 5px; background:white; display:none;">
+                            <div align="center" style="font-family: AvenirNext-UltraLight; font-size:30px;">LEGEND</div>
+                            <div align="center"><img src="img/colors.png" width="250" style="margin-left:0px;"></div>
+                            <div align="center"><img src="img/legend1_3.png" width="213" style="margin-left:13px;"></div>
+                            <img src="img/close3.png" width="30" style="position:absolute; top:-15px; right:-15px;">
+                                <br><br>
+                                </div>
+                        
+                    </page>
+                </panel> 
+                
+                
+                
+                
+                
+                
+                
+                <panel id="panel5" title="more" data-appml-icon="00-appML.png">
+                    
+                    
+                    <page id="more_page" scrollable="false">
+                        
+                        <div align="left" style="padding:10px">
+                            <ul>                            
+                                <li class="arrow"><a href="#profile_page">My profile</a></li>
+                                <li class="arrow"><a href="#foodslist_page">Nitric Oxide-rich foods</a></li>
+                                <li class="arrow"><a href="#strips_page">How to use test strips</a></li>
+                                <li class="arrow"><a href="#" onclick="callWebPage('www.amazon.com/Nitric-Oxide-Test-Strips-Berkeley/dp/B00BMVQS02/ref=sr_1_1?ie=UTF8&qid=1363102014&sr=8-1&keywords=berkeley+test+nitric+oxide+test+strips')">Online Store</a></li>
+                                <li class="arrow"><a href="#aboutBT_page">About <span style="font:normal 16px GurmukhiMN-Bold;">Berkeley Test<span class='superscript'>®</span></span></a></li>
+                                <li class="arrow"><a href="#" onclick="callWebPage('www.berkeleytest.com')"><span style="font:normal 16px GurmukhiMN-Bold;">Berkeley Test<span class='superscript'>®</span></span> Online</a></li>
+                            </ul> 
+                        </div>
+                    </page>   
+                    
+                    
+                    
+                    
+                    <page id="profile_page" scrollable="false">
+                        <div align="left" style="padding:10px">
+                            
+                            <input value="" type="hidden" id="user_id"/>
+                            
+                            <ul class="nicebox" style="margin-left:10px;">
+                                <li>
+                                    <table width="100%">
+                                        <tr>
+                                            <td valign="bottom" width="150px">
+                                                <div style='border:3px solid #FFF; box-shadow:0px 3px 3px #ccc; display:inline-block; width:80px; height:80px; border-radius:50%; overflow:hidden'><img id="userPictureSrc" src="img/fb_user.png" onerror="$(this).attr('src','fb_user.png')" width="80"></div>
+                                            </td>
+                                            <td align="center" valign="bottom">
+                                                <div>
+                                                    <span style="font-family:AvenirNextCondensed-DemiBold; font-size:12px">NOTIFICATIONS</span><br>
+                                                    <img class="toggle_button" src='img/toggle_on.png' width='78'></div>
+                                                <div style="display:inline-block"><a href="#" onclick="sign_off()" class="redButton" style="font-size:11px; height:15px; padding:5px 9px 3px 9px; width:55px">SIGN OFF</a></div>
+                                            </td>
+                                        </tr>
+                                    </table>
+                                </li>
+                                <li>
+                                    <div>
+                                        <div>E-mail:</div>
+                                        <div><input value="" type="email" id="user_email"/></div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div>
+                                        <div>Password:</div>
+                                        <div><input value="" type="password" id="user_password"/></div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div onclick='dob_selector("user_age")'>
+                                        <div>Year of birth:</div>
+                                        <div><input value="" disabled="disabled" type="text" id="user_age"/></div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div onclick='sex_selector("user_sex")'>
+                                        <div>Gender:</div>
+                                        <div><input value="" disabled="disabled" type="text" id="user_sex"/></div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div onclick='weight_selector("user_weight")'>
+                                        <div>Weight:</div>
+                                        <div><input value="" disabled="disabled" type="text" id="user_weight"/></div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div onclick='hypertensive_selector("user_hypertensive")'>
+                                        <div>Blood pressure status:</div>
+                                        <div><input value="" disabled="disabled" type="text" id="user_hypertensive"/></div>
+                                    </div>
+                                </li>
+                                <li>
+                                    <div onclick='activity_selector("user_activity")'>
+                                        <div>Physical activity:</div>
+                                        <div><input value="" disabled="disabled" type="text" id="user_activity"/></div>
+                                    </div>
+                                </li>
+                            </ul>
+                            
+                        </div>
+                    </page>   
+                    
+                    
+                    
+                    <page id="alertspage" scrollable="false">
+                        
+                        <div align="left" style="padding:10px">
+                            <ul>
+                                <li><a href="#profile_page">Morning reminder</a></li>
+                                <li><a href="#profile_page">Afternoon reminder</a></li>
+                            </ul>
+                        </div>
+                    </page>
+                    
+                    
+                    
+                    
+                    <page id="foodslist_page" scrollable="false">
+                        <div align="center" style="background: -webkit-linear-gradient(top, rgba(219,97,169,1) 0%,rgba(229,215,226,1) 100%); ">
+                            <br><br>
+                            
+                            <table>
+                                <tr><td colspan=2 style="border-top:1px dotted rgba(0,0,0,0.8)"></td></tr>
+                                <tr>
+                                    <td style="-webkit-transform: rotate(-90deg); text-align:center; font-family:AvenirNext-UltraLight; font-size:20px">VERY HIGH</td>
+                                    <td>
+                                        Arugula<br>
+                                        Bok Choy<br>
+                                        Spinach<br>
+                                        Lettuce<br>
+                                        Swiss Chard<br>
+                                        Celery<br>
+                                    </td>
+                                </tr>
+                                <tr><td colspan=2 style="border-top:1px dotted rgba(0,0,0,0.8)"></td></tr>
+                                <tr>
+                                    <td style="-webkit-transform: rotate(-90deg); text-align:center; font-family:AvenirNext-UltraLight; font-size:20px">HIGH</td>
+                                    <td>
+                                        Beetroots<br>
+                                        Chinese cabbage<br>
+                                        Radish<br>
+                                        Endive<br>
+                                        Mustard leaf<br>
+                                        Fennel<br>
+                                    </td>
+                                </tr>
+                                <tr><td colspan=2 style="border-top:1px dotted rgba(0,0,0,0.8)"></td></tr>
+                                <tr>
+                                    <td style="-webkit-transform: rotate(-90deg); text-align:center; font-family:AvenirNext-UltraLight; font-size:20px">MEDIUM</td>
+                                    <td>
+                                        Turnips<br>
+                                        Green Beans<br>
+                                        Cabbage<br>
+                                        Leeks<br>
+                                        Kale<br>
+                                        </tr>
+                                <tr><td colspan=2 style="border-top:1px dotted rgba(0,0,0,0.8)"></td></tr>
+                                <tr>
+                                    <td style="-webkit-transform: rotate(-90deg); text-align:center; font-family:AvenirNext-UltraLight; font-size:20px">LOW</td>
+                                    <td>
+                                        Carrots<br>
+                                        Broccoli<br>
+                                        Cucumber<br>
+                                        Cauliflower<br>
+                                        Potato<br>
+                                    </td>
+                                </tr>
+                                <tr><td colspan=2 style="border-top:1px dotted rgba(0,0,0,0.8)"></td></tr>
+                                <tr>
+                                    <td style="-webkit-transform: rotate(-90deg); text-align:center; font-family:AvenirNext-UltraLight; font-size:20px">VERY LOW</td>
+                                    <td>
+                                        Onions<br>
+                                        Garlic<br>
+                                        Tomato<br>
+                                        Asparagus<br>
+                                        Brussels sprouts<br>
+                                        Peas<br>
+                                        Pepper<br>
+                                    </td>
+                                </tr>
+                                <tr><td colspan=2 style="border-top:1px dotted rgba(0,0,0,0.8)"></td></tr>
+                            </table>
+                            <br><br>
+                            <div style="text-align:left; padding:10px; background:white; font-family:AvenirNextCondensed-Regular;">
+                                <p>
+                                The list of vegetables is a partial list of some common vegetables from HIGH to LOW Nitric Oxide richness or potency.  We welcome your suggestions.   Please let us know your favorite Nitric Oxide potent foods at <span style='display:inline; border-bottom:1px dotted black' onclick='send_mail()'>info@berkeleytest.com</span>.
+                                </p>
+                                <br>
+                                <p>
+                                Our classification is based on the precursor of Nitrate Oxide found within a specific vegetable.  To help you better understand Nitric Oxide rich foods, 'My Stats' will calculate the relative amount you ate in context to your Nitric Oxide status after a meal.
+                                </p>
+                                <br>
+                            </div>
+                        </div>
+                    </page>
+                    
+                    
+                    
+                    <page id="strips_page" scrollable="false">
+                        <div align="left" style="padding:10px">
+                            <img src="img/strip3.png" width=300>
+                                <p style="padding:10px">On one end of the strip is the saliva absorption pad ("saliva here") that collects saliva from your your tongue.  The other end is the NO test pad (as highlighted by the dark line).</p><br>
+                                <img src="img/strip_how.png" style="float:left; padding:10px 0px" width=120>
+                                    <ol>
+                                        <li>Place the collection pad ("saliva here") on your tongue for 3-5 seconds to collect saliva.</li>
+                                        <li>Remove the strip from your mouth and fold the two ends of the strip together.</li>
+                                        <li>Gently press the absorption pad against the NO test pad for 3-5 seconds to transfer the saliva.</li>
+                                        <li>After pressing together for 2-3 seconds, release and watch the test pad change color within 45 seconds.</li>
+                                        <li>On the outside of the canister for Saliva NO Test Strips a color chart is found.  Compare you NO test strip to the color chart to read your Nitric Oxide Level.</li>
+                                    </ol>
+                                    <br>
+                                    
+                                    </div>
+                    </page>
+                    
+                    
+                    
+                    
+                    <page id="aboutBT_page" scrollable="false">
+                        <div align="left" style="padding:15px; font-family: AvenirNextCondensed-Regular;">
+                            
+                            <p>
+                            <b>To ensure vascular fitness, you can now self-check your Nitric Oxide status.  Berkeley Test<span class='superscript'>®</span> is the first saliva test to monitor your Nitric Oxide levels in context of your dietary patterns of Nitric Oxide-rich natural whole foods.</b>
+                            </p>
+                            <p>
+                            To learn more about Nitric Oxide potent or rich foods go to <span style='display:inline; border-bottom:1px dotted black' onclick="callWebPage('www.berkeleytest.com')">www.berkeleytest.com</span>.
+                            </p>
+                            <p>
+                            <b>Why do I want to measure saliva Nitric Oxide?</b><br>
+                            Nitric Oxide is a short-lived, naturally-occurring molecule that regulates cardiovascular activity.  Elevated levels of NO can lower cardiovascular risk and increase athletic performance.  Nitric Oxide can be elevated with diets, such as the, DASH and Mediterranean diets, loaded with vegetables rich in leafy greens.
+                            </p>
+                            <p>
+                            <b>When should I use the Test Strips?  How often should I measure my saliva Nitric Oxide levels?</b><br>
+                            It is best to get a measurement as soon as you get out of bed and take another reading 1-3 hours after you eat.  Record the Nitric Oxide level and track your levels on your Cardio Diet Tracker.  My Stats will provide insights as to what foods increase Nitric Oxide levels and for how long.
+                            </p>
+                            <p>
+                            <b>What happens to my saliva levels several hours after a Nitric Oxide rich meal?</b><br>
+                            Nitric Oxide levels rise and fall throughout the day.  Typically, levels peak within 2-3 hours after a Nitric Oxide-rich leafy green salad.  By 6-12 hours levels begin to fall, unless you consume additional Nitric Oxide-rich vegetables.
+                            </p>
+                            <p>
+                            <b>Who should use the Nitric Oxide Test Strip and Cardio Diet Tracker by Berkeley Test?</b><br>
+                            This app and test strip is intended for individuals wanting to stay healthy.  It is to remind you to eat a balanced diet rich in leafy greens and colorful vegetables.  It is not intended to diagnose, cure, mitigate, treat, or prevent cardiovascular disease.  Instead, Saliva Nitric Oxide Strips promotes a healthy lifestyle to keep us fit, energized and disease fighting.
+                            </p>
+                            
+                        </div>
+                    </page>   
+                    
+                </panel>
+                
+                
+                
+                
+                <bottom height='40'>
+                    <div id="bottomtabbar">
+                        <table class="bottommenu" cellpadding=0 cellspacing=0>
+                            <tr> 
+                                <td align="center" ontouchstart="jQT.goTo('#myday_page');plot_measurements(0)"><div><img src="img/icon_settings.png" width="24"><br>My Day</div></td>
+                                <td align="center" ontouchstart="jQT.goTo('#mylog_page');list_measurements(0);$('#mylog_stats').hide();$('#mylog_picker').show();"><div><img src="img/icon_log.png" width="24"><br>My Log</div></td>
+                                <td align="center"><div></div></td>
+                                <td align="center" ontouchstart="jQT.goTo('#stats_page')"><div><img src="img/icon_stats.png" width="24"><br>My Stats</div></td>
+                                <td align="center" ontouchstart="jQT.goTo('#more_page')"><div><img src="img/icon_more.png" width="24"><br>More</div></td>
+                            </tr>
+                        </table> 
+                        <div class="roundtab" ontouchstart="jQT.goTo('#mynoxy_page');current_recording_id=''; TOM=0; LOF=[];LOE=[];$('#meal_items').html('<li><br></li><li><br></li><li><br></li>');$('#exercise_items').html('<li><br></li><li><br></li><li><br></li>');">My NO Levels <img src="img/icon_strips_selected.png" height="40" style="position: absolute;top:5px; left:5px"></div>
+                    </div>         
+                </bottom>
+                
+                
+			</content>
+            
+		</appml>
+    </body>
+</html>
