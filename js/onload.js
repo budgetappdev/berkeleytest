@@ -5,7 +5,7 @@
 
 function onBodyLoad()
 {
-  alert("onBodyLoad");
+
     
     $('body').bind('touchmove',function(e){
                    if(!$('#aboutBT_page').has($(e.target)).length && !$('#about_page').has($(e.target)).length && !$('#strips_page').has($(e.target)).length && !$('#foodslist_page').has($(e.target)).length && !$('#profile_page').has($(e.target)).length && !$('#mylog_scrollable').has($(e.target)).length && !$('#edit_scrollable').has($(e.target)).length && !$('#summary_scrollable').has($(e.target)).length && !$('#food_list').has($(e.target)).length && !$('#foodedit_list').has($(e.target)).length){e.preventDefault()};
@@ -184,7 +184,6 @@ function onBodyLoad()
     
     
     $("#about_page:visible").livequery(function(){
-alert("about_page");
                                        $("#appML_navigation_bar").hide();
                                        
                                        
@@ -200,7 +199,7 @@ alert("about_page");
     
     
     $("#intro_page:visible").livequery(function(){
-                                       alert("intro page");
+
                                        $("#appML_top").show();
                                        $("#appML_navigation_bar").show();
                                        
