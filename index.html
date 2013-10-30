@@ -9,7 +9,7 @@
                 <link rel="stylesheet" href="appML/css/hicTech/MobileAppStyle.css">
                     <style type="text/css" media="all">@import "appML/themes/apple/theme.css";</style>
                     
-                   
+
                     <script src="js/ChildBrowser.js" type="application/x-javascript" charset="utf-8"></script>
                     <script src="js/EmailComposer.js" type="application/x-javascript" charset="utf-8"></script>
                     <script src="js/LocalNotification.js" type="application/x-javascript" charset="utf-8"></script>
@@ -208,6 +208,7 @@
                     
                     function onBodyLoad()
                     {
+alert("onBodyLoad");
                         setTimeout(function(){
                                    
                                    document.addEventListener("deviceready", onDeviceReady, false);
