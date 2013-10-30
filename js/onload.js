@@ -184,6 +184,7 @@ function onBodyLoad()
     
     
     $("#about_page:visible").livequery(function(){
+alert("about_page");
                                        $("#appML_navigation_bar").hide();
                                        
                                        
@@ -199,7 +200,7 @@ function onBodyLoad()
     
     
     $("#intro_page:visible").livequery(function(){
-                                       
+                                       alert("intro page");
                                        $("#appML_top").show();
                                        $("#appML_navigation_bar").show();
                                        
